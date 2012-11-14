@@ -1,4 +1,5 @@
-munin-client
+munin
 ============
 
-Client library for munin
+Client library for munin in go
+

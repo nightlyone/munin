@@ -1,0 +1,9 @@
+TODO
+====
+ * DOCUMENT stuff
+ * handle more errors
+ * Implement config requests
+ * Implement reconnects (maybe coupled witth list + config)
+ * massage results for carbon like https://github.com/indygreg/collectd-carbon/blob/master/carbon_writer.py
+ * write to carbon at all.
+ * make stuff configurable
