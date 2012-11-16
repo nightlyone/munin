@@ -20,7 +20,8 @@ func main() {
 
 	conn, err := net.Dial("tcp", net.JoinHostPort(*munin, "munin"))
 	if err != nil {
-		panic("error connecting to " + *munin + ", error" + err.Error())
+		println("error connecting to " + *munin + ", error" + err.Error())
+		os.Exit(2)
 	}
 	valChan := client.NewMuninClient(conn, *interval, done)
 	for values := range valChan {
