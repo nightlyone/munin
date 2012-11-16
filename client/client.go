@@ -1,6 +1,7 @@
 package client
 
 import (
+	"io"
 	"net/textproto"
 	"os"
 	"strings"
@@ -65,12 +66,8 @@ func fetch(conn *textproto.Conn, what string) (values KeyValueMap) {
 	return values
 }
 
-func NewMuninClient(hostport string, interval time.Duration, done <-chan os.Signal) <-chan KeyValueMap {
-	conn, err := textproto.Dial("tcp4", hostport)
-	if err != nil {
-		panic("error connecting to munin " + err.Error())
-		return nil
-	}
+func NewMuninClient(connection io.ReadWriteCloser, interval time.Duration, done <-chan os.Signal) <-chan KeyValueMap {
+	conn := textproto.NewConn(connection)
 	data := make(chan KeyValueMap, 1)
 	go func() {
 		ticker := time.NewTicker(interval)
