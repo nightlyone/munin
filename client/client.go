@@ -3,8 +3,8 @@ package client
 import (
 	"net/textproto"
 	"os"
-	"time"
 	"strings"
+	"time"
 )
 
 type KeyValueMap map[string]string
@@ -45,7 +45,7 @@ func fetch(conn *textproto.Conn, what string) (values KeyValueMap) {
 	}
 
 	conn.StartResponse(id)
-	dotlines, err :=  conn.ReadDotLines()
+	dotlines, err := conn.ReadDotLines()
 	conn.EndResponse(id)
 	if err != nil {
 		panic("error in fetch dotlines for" + what + ", err is " + err.Error())
@@ -81,7 +81,7 @@ func NewMuninClient(hostport string, interval time.Duration, done <-chan os.Sign
 				headers := list(conn)
 				for _, prefix := range headers {
 					for key, value := range fetch(conn, prefix) {
-						kv[prefix + "." + key] = value
+						kv[prefix+"."+key] = value
 					}
 				}
 				data <- kv
@@ -95,4 +95,3 @@ func NewMuninClient(hostport string, interval time.Duration, done <-chan os.Sign
 	}()
 	return data
 }
-
