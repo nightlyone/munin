@@ -18,7 +18,7 @@ func main() {
 	done := make(chan os.Signal, 32)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
-	conn, err := net.Dial("tcp", *munin+":munin")
+	conn, err := net.Dial("tcp", net.JoinHostPort(*munin, "munin"))
 	if err != nil {
 		panic("error connecting to " + *munin + ", error" + err.Error())
 	}
