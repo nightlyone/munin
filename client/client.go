@@ -49,7 +49,7 @@ func fetch(conn *textproto.Conn, what string) (values KeyValueMap) {
 	dotlines, err := conn.ReadDotLines()
 	conn.EndResponse(id)
 	if err != nil {
-		panic("error in fetch dotlines for" + what + ", err is " + err.Error())
+		panic("error in fetch dotlines for " + what + ", err is " + err.Error())
 		return values
 	}
 	for _, line := range dotlines {
