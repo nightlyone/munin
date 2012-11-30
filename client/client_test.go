@@ -2,13 +2,12 @@ package client
 
 import (
 	"bufio"
-	"strings"
 	"io"
+	"os"
+	"strings"
 	"testing"
 	"time"
-	"os"
 )
-
 
 // Thanks rsc (Russ Cox, Google Inc.) for this nice fake code
 type fakePipes struct {
@@ -57,29 +56,29 @@ func fakeServer(t *testing.T, rw io.ReadWriteCloser) {
 // End of rsc (Russ Cox, Google Inc.) code
 
 var fakeReply = map[string]string{
-	"" : "# munin node at localhost\n",
-	"list" : "cpu cpuspeed\n",
-	"quit" : "",
-	"fetch cpu" : "user.value 234600\n" +
-			"nice.value 1931\n" +
-			"system.value 80354\n" +
-			"idle.value 11153645\n" +
-			"iowait.value 98142\n" +
-			"irq.value 1\n" +
-			"softirq.value 706\n" +
-			"steal.value 0\n" +
-			".\n",
+	"":     "# munin node at localhost\n",
+	"list": "cpu cpuspeed\n",
+	"quit": "",
+	"fetch cpu": "user.value 234600\n" +
+		"nice.value 1931\n" +
+		"system.value 80354\n" +
+		"idle.value 11153645\n" +
+		"iowait.value 98142\n" +
+		"irq.value 1\n" +
+		"softirq.value 706\n" +
+		"steal.value 0\n" +
+		".\n",
 }
 
-var expectedReply = map[string]string {
-	"cpu.user" : "234600",
-	"cpu.nice" : "1931",
-	"cpu.system" : "80354",
-	"cpu.idle" : "11153645",
-	"cpu.iowait" : "98142",
-	"cpu.irq" : "1",
-	"cpu.softirq" : "706",
-	"cpu.steal" : "0",
+var expectedReply = map[string]string{
+	"cpu.user":    "234600",
+	"cpu.nice":    "1931",
+	"cpu.system":  "80354",
+	"cpu.idle":    "11153645",
+	"cpu.iowait":  "98142",
+	"cpu.irq":     "1",
+	"cpu.softirq": "706",
+	"cpu.steal":   "0",
 }
 
 func TestConnect(t *testing.T) {
@@ -88,7 +87,7 @@ func TestConnect(t *testing.T) {
 	t.Logf("Seting up fake server done\n")
 	interval := time.Millisecond * 200
 	done := make(chan os.Signal, 32)
-	go func(die chan<- os.Signal){
+	go func(die chan<- os.Signal) {
 		time.Sleep(interval * 2)
 		die <- os.Interrupt
 	}(done)
