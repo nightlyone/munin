@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"syscall"
 	"time"
 )
 
@@ -16,7 +15,7 @@ var interval = flag.Duration("interval", 1*time.Minute, "interval between querie
 func main() {
 	flag.Parse()
 	done := make(chan os.Signal, 32)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(done, os.Interrupt, os.Kill)
 
 	conn, err := net.Dial("tcp", net.JoinHostPort(*munin, "munin"))
 	if err != nil {
