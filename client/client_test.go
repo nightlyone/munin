@@ -22,26 +22,34 @@ func (p *fakePipes) Close() error {
 	return nil
 }
 
-func fakeConnect() (io.ReadWriteCloser, error) {
+func fakeConnect(t *testing.T) (io.ReadWriteCloser, error) {
 	r1, w1 := io.Pipe()
 	r2, w2 := io.Pipe()
-	go fakeServer(&fakePipes{r1, w2})
+	go fakeServer(t, &fakePipes{r1, w2})
 	return &fakePipes{r2, w1}, nil
 }
 
-func fakeServer(rw io.ReadWriteCloser) {
+func fakeServer(t *testing.T, rw io.ReadWriteCloser) {
 	b := bufio.NewReader(rw)
-	rw.Write([]byte(fakeReply[""]))
+	_, err := rw.Write([]byte(fakeReply[""]))
+	if err != nil {
+		t.Errorf("fakeServer: Banner write causes %s", err)
+	}
 	for {
 		line, err := b.ReadString('\n')
 		if err != nil {
+			t.Errorf("fakeServer: Reading causes %s", err)
 			break
 		}
 		reply := fakeReply[strings.TrimSpace(line)]
 		if reply == "" {
 			break
 		}
-		rw.Write([]byte(reply))
+		_, err = rw.Write([]byte(reply))
+		if err != nil {
+			t.Errorf("fakeServer: Writing causes %s", err)
+			break
+		}
 	}
 	rw.Close()
 }
@@ -76,7 +84,7 @@ var expectedReply = map[string]string {
 
 func TestConnect(t *testing.T) {
 	t.Logf("Seting up fake server\n")
-	conn, _ := fakeConnect()
+	conn, _ := fakeConnect(t)
 	t.Logf("Seting up fake server done\n")
 	interval := time.Millisecond * 200
 	done := make(chan os.Signal, 32)
