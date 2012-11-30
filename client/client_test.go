@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 	"os"
-	"syscall"
 )
 
 
@@ -83,7 +82,7 @@ func TestConnect(t *testing.T) {
 	done := make(chan os.Signal, 32)
 	go func(die chan<- os.Signal){
 		time.Sleep(interval * 2)
-		die <- syscall.SIGINT
+		die <- os.Interrupt
 	}(done)
 	valChan := NewMuninClient(conn, interval, done)
 	reply := make(map[string]string)
