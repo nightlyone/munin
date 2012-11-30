@@ -39,7 +39,6 @@ func fakeServer(rw io.ReadWriteCloser) {
 		}
 		reply := fakeReply[strings.TrimSpace(line)]
 		if reply == "" {
-			rw.Write([]byte("* BYE\r\n"))
 			break
 		}
 		rw.Write([]byte(reply))
