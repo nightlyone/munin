@@ -37,7 +37,9 @@ func fakeServer(t *testing.T, rw io.ReadWriteCloser) {
 	for {
 		line, err := b.ReadString('\n')
 		if err != nil {
-			t.Errorf("fakeServer: Reading causes %s", err)
+			if err != io.EOF {
+				t.Errorf("fakeServer: Reading causes %s", err)
+			}
 			break
 		}
 		reply := fakeReply[strings.TrimSpace(line)]
@@ -57,7 +59,7 @@ func fakeServer(t *testing.T, rw io.ReadWriteCloser) {
 
 var fakeReply = map[string]string{
 	"":     "# munin node at localhost\n",
-	"list": "cpu cpuspeed\n",
+	"list": "cpu\n",
 	"quit": "",
 	"fetch cpu": "user.value 234600\n" +
 		"nice.value 1931\n" +
