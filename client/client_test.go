@@ -50,6 +50,7 @@ func fakeServer(rw io.ReadWriteCloser) {
 // End of rsc (Russ Cox, Google Inc.) code
 
 var fakeReply = map[string]string{
+	"" : "# munin node at localhost\n",
 	"list" : "cpu cpuspeed\n",
 	"quit" : "",
 	"fetch cpu" : "user.value 234600\n" +
