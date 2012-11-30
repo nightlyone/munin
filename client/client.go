@@ -68,6 +68,10 @@ func fetch(conn *textproto.Conn, what string) (values KeyValueMap) {
 
 func NewMuninClient(connection io.ReadWriteCloser, interval time.Duration, done <-chan os.Signal) <-chan KeyValueMap {
 	conn := textproto.NewConn(connection)
+	// skip the banner
+	if _, err := conn.ReadLine(); err != nil {
+		panic(err)
+	}
 	data := make(chan KeyValueMap, 1)
 	go func() {
 		ticker := time.NewTicker(interval)
