@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/nightlyone/munin/client"
+	"github.com/nightlyone/munin"
 	"net"
 	"os"
 	"os/signal"
@@ -22,7 +22,7 @@ func main() {
 		println("error connecting to " + *munin + ", error" + err.Error())
 		os.Exit(2)
 	}
-	valChan := client.NewMuninClient(conn, *interval, done)
+	valChan := munin.NewMuninClient(conn, *interval, done)
 	for values := range valChan {
 		for key, value := range values {
 			println(key, ":", value)
