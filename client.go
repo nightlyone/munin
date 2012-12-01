@@ -10,6 +10,12 @@ import (
 
 type KeyValueMap map[string]string
 
+type Client struct {
+	conn    *textproto.Conn
+	headers []string
+	values  chan KeyValueMap
+}
+
 func list(conn *textproto.Conn) []string {
 	id, err := conn.Cmd("list")
 	values := make([]string, 0, 16)
@@ -66,33 +72,48 @@ func fetch(conn *textproto.Conn, what string) (values KeyValueMap) {
 	return values
 }
 
-func NewMuninClient(connection io.ReadWriteCloser, interval time.Duration, done <-chan os.Signal) <-chan KeyValueMap {
-	conn := textproto.NewConn(connection)
-	// skip the banner
-	if _, err := conn.ReadLine(); err != nil {
-		panic(err)
-	}
-	data := make(chan KeyValueMap, 1)
+func (c *Client) Run(interval time.Duration, done <-chan os.Signal) <-chan KeyValueMap {
 	go func() {
 		ticker := time.NewTicker(interval)
 		for {
 			kv := make(KeyValueMap)
 			select {
 			case <-ticker.C:
-				headers := list(conn)
-				for _, prefix := range headers {
-					for key, value := range fetch(conn, prefix) {
+				c.headers = list(c.conn)
+				for _, prefix := range c.headers {
+					for key, value := range fetch(c.conn, prefix) {
 						kv[prefix+"."+key] = value
 					}
 				}
-				data <- kv
+				c.values <- kv
 			case <-done:
 				ticker.Stop()
-				close(data)
-				conn.Close()
+				close(c.values)
+				c.conn.Close()
 				return
 			}
 		}
 	}()
-	return data
+	return c.values
+}
+
+func newMuninClient(connection io.ReadWriteCloser) (client *Client, err error) {
+	conn := textproto.NewConn(connection)
+	// skip the banner
+	if _, err = conn.ReadLine(); err != nil {
+		return nil, err
+	}
+	client = &Client{
+		conn:   conn,
+		values: make(chan KeyValueMap, 1),
+	}
+	return client, nil
+}
+
+func NewMuninClient(connection io.ReadWriteCloser, interval time.Duration, done <-chan os.Signal) <-chan KeyValueMap {
+	client, err := newMuninClient(connection)
+	if err != nil {
+		panic(err)
+	}
+	return client.Run(interval, done)
 }
