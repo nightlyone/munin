@@ -21,14 +21,14 @@ func (p *fakePipes) Close() error {
 	return nil
 }
 
-func fakeConnect(t *testing.T) (io.ReadWriteCloser, error) {
+func fakeConnect(t *testing.T, fakeReply fakeResponseMap) (io.ReadWriteCloser, error) {
 	r1, w1 := io.Pipe()
 	r2, w2 := io.Pipe()
-	go fakeServer(t, &fakePipes{r1, w2})
+	go fakeServer(t, &fakePipes{r1, w2}, fakeReply)
 	return &fakePipes{r2, w1}, nil
 }
 
-func fakeServer(t *testing.T, rw io.ReadWriteCloser) {
+func fakeServer(t *testing.T, rw io.ReadWriteCloser, fakeReply fakeResponseMap) {
 	b := bufio.NewReader(rw)
 	_, err := rw.Write([]byte(fakeReply[""]))
 	if err != nil {
@@ -57,7 +57,9 @@ func fakeServer(t *testing.T, rw io.ReadWriteCloser) {
 
 // End of rsc (Russ Cox, Google Inc.) code
 
-var fakeReply = map[string]string{
+type fakeResponseMap map[string]string
+
+var fakeReply = fakeResponseMap{
 	"":     "# munin node at localhost\n",
 	"list": "cpu\n",
 	"quit": "",
@@ -85,7 +87,7 @@ var expectedReply = map[string]string{
 
 func TestConnect(t *testing.T) {
 	t.Logf("Seting up fake server\n")
-	conn, _ := fakeConnect(t)
+	conn, _ := fakeConnect(t, fakeReply)
 	t.Logf("Seting up fake server done\n")
 	interval := time.Millisecond * 200
 	done := make(chan os.Signal, 32)
