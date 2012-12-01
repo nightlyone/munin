@@ -43,17 +43,17 @@ func pair(input, sep string) (string, string) {
 	return both[0], both[1]
 }
 
-func fetch(conn *textproto.Conn, what string) (values KeyValueMap) {
-	id, err := conn.Cmd("fetch %s", what)
+func (c *Client) fetch(what string) (values KeyValueMap) {
+	id, err := c.conn.Cmd("fetch %s", what)
 	values = make(KeyValueMap)
 	if err != nil {
 		panic("error in fetch connection for " + what + ", err is " + err.Error())
 		return values
 	}
 
-	conn.StartResponse(id)
-	dotlines, err := conn.ReadDotLines()
-	conn.EndResponse(id)
+	c.conn.StartResponse(id)
+	dotlines, err := c.conn.ReadDotLines()
+	c.conn.EndResponse(id)
 	if err != nil {
 		panic("error in fetch dotlines for " + what + ", err is " + err.Error())
 		return values
@@ -81,7 +81,7 @@ func (c *Client) Run(interval time.Duration, done <-chan os.Signal) <-chan KeyVa
 			case <-ticker.C:
 				c.headers = c.list()
 				for _, prefix := range c.headers {
-					for key, value := range fetch(c.conn, prefix) {
+					for key, value := range c.fetch(prefix) {
 						kv[prefix+"."+key] = value
 					}
 				}
