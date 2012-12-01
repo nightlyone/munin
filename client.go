@@ -79,7 +79,9 @@ func (c *Client) Run(interval time.Duration, done <-chan os.Signal) <-chan KeyVa
 			kv := make(KeyValueMap)
 			select {
 			case <-ticker.C:
-				c.headers = c.list()
+				if c.headers == nil {
+					c.headers = c.list()
+				}
 				for _, prefix := range c.headers {
 					for key, value := range c.fetch(prefix) {
 						kv[prefix+"."+key] = value
