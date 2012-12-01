@@ -6,7 +6,7 @@ Client library for munin in go
 [![Build Status][1]][2]
 
 [1]: https://secure.travis-ci.org/nightlyone/munin.png
-[2]: http://www.travis-ci.org/nightlyone/munin
+[2]: http://travis-ci.org/nightlyone/munin
 
 
 LICENSE
