@@ -16,22 +16,22 @@ type Client struct {
 	values  chan KeyValueMap
 }
 
-func list(conn *textproto.Conn) []string {
-	id, err := conn.Cmd("list")
+func (c *Client) list() []string {
+	id, err := c.conn.Cmd("list")
 	values := make([]string, 0, 16)
 	if err != nil {
 		panic("error in list connection err is " + err.Error())
 		return values
 	}
-	conn.StartResponse(id)
-	for line, err := conn.ReadLine(); err == nil && len(line) > 0; line, err = conn.ReadLine() {
+	c.conn.StartResponse(id)
+	for line, err := c.conn.ReadLine(); err == nil && len(line) > 0; line, err = c.conn.ReadLine() {
 		if line[0] == '#' {
 			continue
 		}
 		values = append(values, strings.Fields(line)...)
 		break
 	}
-	conn.EndResponse(id)
+	c.conn.EndResponse(id)
 	if err != nil {
 		panic("error in list readline err is " + err.Error())
 	}
@@ -79,7 +79,7 @@ func (c *Client) Run(interval time.Duration, done <-chan os.Signal) <-chan KeyVa
 			kv := make(KeyValueMap)
 			select {
 			case <-ticker.C:
-				c.headers = list(c.conn)
+				c.headers = c.list()
 				for _, prefix := range c.headers {
 					for key, value := range fetch(c.conn, prefix) {
 						kv[prefix+"."+key] = value
