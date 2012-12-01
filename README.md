@@ -25,12 +25,15 @@ Install [Go 1][3], either [from source][4] or [with a prepackaged binary][5].
 [5]: http://golang.org/doc/install
 
 Get the library
+
 	go get github.com/nightlyone/munin
 
 Get the mfgo client
+
 	go get github.com/nightlyone/munin/cmd/mfgo
 
 Play around with the client
+
 	$GOROOT/bin/mfgo -h
 
 contributing
