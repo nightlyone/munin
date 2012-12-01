@@ -3,6 +3,12 @@ munin
 
 Client library for munin in go
 
+[![Build Status][1]][2]
+
+[1]: https://secure.travis-ci.org/nightlyone/munin.png
+[2]: http://www.travis-ci.org/nightlyone/munin
+
+
 LICENSE
 -------
 BSD
@@ -13,6 +19,11 @@ documentation
 
 compile and install
 -------------------
+Install [Go 1][3], either [from source][4] or [with a prepackaged binary][5].
+[3]: http://golang.org
+[4]: http://golang.org/doc/install/source
+[5]: http://golang.org/doc/install
+
 Get the library
 	go get github.com/nightlyone/munin
 
