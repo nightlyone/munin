@@ -99,15 +99,26 @@ func (c *Client) Run(interval time.Duration, done <-chan os.Signal) <-chan KeyVa
 	return c.values
 }
 
-func newMuninClient(connection io.ReadWriteCloser) (client *Client, err error) {
-	conn := textproto.NewConn(connection)
-	// skip the banner
-	if _, err = conn.ReadLine(); err != nil {
-		return nil, err
+func (c *Client) connect(connection io.ReadWriteCloser) error {
+	if c.conn != nil {
+		c.conn.Close()
 	}
+	c.conn = textproto.NewConn(connection)
+	// skip the banner
+	if _, err := c.conn.ReadLine(); err != nil {
+		c.conn = nil
+		return err
+	}
+	return nil
+}
+
+func newMuninClient(connection io.ReadWriteCloser) (client *Client, err error) {
 	client = &Client{
-		conn:   conn,
 		values: make(chan KeyValueMap, 1),
+	}
+	err = client.connect(connection)
+	if err != nil {
+		return nil, err
 	}
 	return client, nil
 }
